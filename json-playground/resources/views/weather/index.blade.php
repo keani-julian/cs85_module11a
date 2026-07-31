@@ -8,7 +8,7 @@
       <th>Low</th>
       <th>Condition</th>
     </tr>
-  </thead>
+  </thead> 
   <tbody>
     @foreach ($weather as $day)
       <tr @if ($day['condition'] === 'Rain') style="background-color: #97cff7;" @endif>
