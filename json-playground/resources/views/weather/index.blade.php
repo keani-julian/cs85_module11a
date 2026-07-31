@@ -11,7 +11,7 @@
   </thead>
   <tbody>
     @foreach ($weather as $day)
-      <tr>
+      <tr @if ($day['condition'] === 'Rain') style="background-color: #97cff7;" @endif>
         <td>{{ $day['day'] }}</td>
         <td>{{ $day['high'] }}&deg;F</td>
         <td>{{ $day['low'] }}&deg;F</td>
