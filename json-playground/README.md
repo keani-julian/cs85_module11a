@@ -1,58 +1,72 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Module 11A: API Data (json-playground)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+GitHub Repo: https://github.com/keani-julian/cs85_module11a
 
-## About Laravel
+### Summary: 
+For this assignment I simulated an API response using a static JSON file. The app reads
+`weather.json` from Laravel's storage, decodes it into a PHP array, passes it to a Blade view, and displays it as an HTML table. 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## How it works
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The data flows through three files:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. **`storage/app/private/weather.json`** — the static file standing in for an API response.
+   Three days of forecast data (day, high, low, condition).
 
-## Learning Laravel
+2. **`app/Http/Controllers/WeatherController.php`** — reads the file with the `Storage`
+   facade, then converts the JSON string into a PHP associative array with
+   `json_decode($json, true)`. The `true` is what makes it an array instead of an object.
+   It then hands the array to the view.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. **`resources/views/weather/index.blade.php`** — loops the array with `@foreach` and
+   prints one table row per day.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+The route lives in `routes/web.php`:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```php
+Route::get('/weather', [WeatherController::class, 'index']);
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Setup Instructions
 
-## Contributing
+You need PHP 8.5 and Composer. 
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Run the follwing in Laravel Herd.
 
-## Code of Conduct
+```bash
+git clone https://github.com/keani-julian/cs85_module11a
+cd cs85_module11a/json-playground
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Then open the site:
 
-## Security Vulnerabilities
+- In Herd, if the folder is in your directory, it is available automatically at
+  http://json-playground.test
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Go to **`/weather`** to see the forecast table 
+http://json-playground.test/weather
 
-## License
+No database setup is needed. 
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Important context on weather.json
+
+`storage/app/private/` is ignored by Laravel's default `.gitignore`, because that folder is
+normally where a running app writes user uploads. Since `weather.json` is source data that
+the whole assignment depends on, I added an exception so it is tracked:
+
+```
+*
+!.gitignore
+!weather.json
+```
+
+Without that, cloning this repo will likely lead the app to crash on `/weather`, because `Storage::get('weather.json')` would not be able to see the file.
+
+I also put the file in `storage/app/private/` rather than `storage/app/`. In Laravel 11 and later the default `local` disk points at `storage/app/private`, so that is where `Storage::get()` checks.
+
+## Screenshot of tablet
+
+![Weekly Weather Forecast table with the rainy day highlighted](module11a-sc.png)
